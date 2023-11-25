@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/sunny"
+        android:title="晴">
+    </item>
+    <item android:id="@+id/cloudy"
+        android:title="阴">
+    </item>
+    <item android:id="@+id/rainy"
+        android:title="雨">
+    </item>
+    <item android:id="@+id/all_weather"
+        android:title="全部">
+    </item>
+</menu>

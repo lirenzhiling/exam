@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/happy"
+        android:title="开心">
+    </item>
+    <item android:id="@+id/angry"
+        android:title="生气">
+    </item>
+    <item android:id="@+id/sad"
+        android:title="伤心">
+    </item>
+    <item android:id="@+id/scary"
+        android:title="害怕">
+    </item>
+    <item android:id="@+id/all_mood"
+        android:title="全部">
+    </item>
+</menu>
