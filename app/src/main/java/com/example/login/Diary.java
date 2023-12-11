@@ -8,6 +8,7 @@ public class Diary extends LitePalSupport {
     private String weather="无";
     private String mood="无";
     private String people_name="无";
+    private String image_file="1";
 
     /*public Diary(String time, String content) {
         this.time = time;
@@ -68,5 +69,13 @@ public class Diary extends LitePalSupport {
 
     public void setMood(String mood) {
         this.mood = mood;
+    }
+
+    public String getImage_file() {
+        return image_file;
+    }
+
+    public void setImage_file(String image_file) {
+        this.image_file = image_file;
     }
 }

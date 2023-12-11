@@ -2,38 +2,48 @@ package com.example.login;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.net.UriKt;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.material.navigation.NavigationView;
 
 import org.litepal.LitePal;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MeFragment extends Fragment implements View.OnClickListener, ModalBottomSheet.EditHead {
 
@@ -52,6 +62,19 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
     private TextView all_number;
     private TextView name;
     private ImageView head;
+    private People my_people;
+
+    private Uri takePictureUri;
+    private Uri choosePictureUri;
+    private ModalBottomSheet modalBottomSheet;
+
+    // 创建临时文件的方法
+    private Uri createPhotoFile(Context context) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp;
+        File photoFile = new File(context.getCacheDir(), imageFileName);
+        return FileProvider.getUriForFile(context, "com.example.login.fileprovider", photoFile);
+    }
 
 
     @Override
@@ -72,6 +95,36 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
         saying_tx = view.findViewById(R.id.saying_tx);
         view.findViewById(R.id.saying_tx).setOnClickListener(this);
         name.setText(id_name);
+        NavigationView navigationView = view.findViewById(R.id.me_list);
+//        navigationView.setCheckedItem(R.id.change);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.change) {
+                    Intent intent = new Intent(requireContext(), EditSaying.class);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt("id_saying", idd);
+                    editor.commit();
+                    //Toast.makeText(v.getContext(), "你按了"+position, Toast.LENGTH_SHORT).show();
+                    requireContext().startActivity(intent);
+                } else if (menuItem.getItemId() == R.id.leave) {
+                    Toast.makeText(requireContext(), "退出", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
+        java.util.List<People> People = LitePal.findAll(People.class);
+        for (People people : People) {
+            if (people.getId_name().equals(id_name)) {
+                String imagePath = people.getHead();
+                my_people = people;
+                File imageFile = new File(imagePath);
+                Glide.with(this)
+                        .load(imageFile)
+                        .circleCrop()
+                        .into(head);
+            }
+        }
 //        LitePal.deleteAll(Saying.class,"id<?","50");
         return view;
     }
@@ -116,16 +169,9 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
 
     @Override
     public void onClick(View v) {
-        if (v == saying_tx) {
-            Intent intent = new Intent(v.getContext(), EditSaying.class);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("id_saying", idd);
-            editor.commit();
-            //Toast.makeText(v.getContext(), "你按了"+position, Toast.LENGTH_SHORT).show();
-            v.getContext().startActivity(intent);
-        } else if (v == head) {
+        if (v == head) {
             // 将底板布局添加到界面中
-            ModalBottomSheet modalBottomSheet = new ModalBottomSheet();
+            modalBottomSheet = new ModalBottomSheet();
             modalBottomSheet.editHead = this;
             modalBottomSheet.show(getChildFragmentManager(), ModalBottomSheet.TAG);
         }
@@ -152,88 +198,93 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
             } else {
                 imageUri = Uri.fromFile(outputImage);
             }
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-            startActivityForResult(intent, TAKE_PHOTO);
+            cameraPerssion.launch(Manifest.permission.CAMERA);
+            modalBottomSheet.dismiss();
+
         } else {
-            Toast.makeText(view.getContext(), "相册", Toast.LENGTH_SHORT).show();
 
-            openGallery(333);
-//            openAlbum();
-            if (ContextCompat.checkSelfPermission(getContext(),READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(getActivity(),new String[]{READ_EXTERNAL_STORAGE},1);
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{READ_EXTERNAL_STORAGE}, 1);
             }
+
+            choosePictureLauncher.launch("image/*");
+            modalBottomSheet.dismiss();
         }
     }
 
-//    private void openAlbum() {
-//        Intent intent = new Intent("android.intent.action.GET_CONTENT");
-//        intent.setType("image/*");
-//        startActivityForResult(intent,CHOOSE_PHOTO);
-//    }
 
-    private void openGallery(int type) {
-        Intent gallery = new Intent(Intent.ACTION_PICK);
-        gallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-//        imageUri=gallery.getData();
-        startActivityForResult(gallery, CHOOSE_PHOTO);
+    private ActivityResultLauncher<Uri> takePictureLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
+        Log.d("takePictureLauncher",result+"");
+        if (result) {
+            if (takePictureUri != null) {
+                setAvatar(takePictureUri);
+            }
+        } else {
+            takePictureUri = null;
+            Toast.makeText(requireContext(), "您未拍照", Toast.LENGTH_SHORT).show();
+            // 拍照失败或被取消，处理相应的逻辑
+        }
+    });
+
+    private ActivityResultLauncher<String> choosePictureLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), result -> {
+        Log.d("choosePictureLauncher",result+"");
+        if (result!=null) {
+            setAvatar(result);
+        } else {
+            choosePictureUri = null;
+            Toast.makeText(requireContext(), "您未选择照片", Toast.LENGTH_SHORT).show();
+            // 选择照片失败或被取消，处理相应的逻辑
+        }
+    });
+
+    private ActivityResultLauncher cameraPerssion = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
+        Log.d("takePictureLauncher",result+"");
+        if (result) {
+            takePhoto(requireContext());
+        } else {
+            Toast.makeText(getContext(), "你禁止了权限", Toast.LENGTH_SHORT).show();
+        }
+    });
+
+
+    private void takePhoto(Context context){
+        takePictureUri = createPhotoFile(context);
+        takePictureLauncher.launch(takePictureUri);
     }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case 1:
-                if (grantResults.length>0&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    Intent intent=new Intent("android.media.action.IMAGE_CAPTURE");
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
-                    startActivityForResult(intent,TAKE_PHOTO);
+
+    private void setAvatar(Uri uri) {
+        Glide.with(this)
+                .load(uri)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .circleCrop()
+                .into(head);
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContext().getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            try {
+//                        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                File file;
+                if (!uri.getScheme().equals("file")){
+                    file = new File(requireContext().getFilesDir(), String.valueOf(System.currentTimeMillis()) + ".jpg");
+                    file.getParentFile().mkdirs();
+                    FileCopy.ioCopyFromUri(requireContext(), uri, file.getAbsolutePath());
                 }else {
-                    Toast.makeText(getContext(), "你禁止了权限", Toast.LENGTH_SHORT).show();
+                    file = UriKt.toFile(uri);
                 }
-                break;
-            default:
-        }
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case TAKE_PHOTO: {
-//                resultCode==RESULT_OK
-                if (imageUri != null) {
-                    try {
-                        Bitmap bitmap = BitmapFactory.decodeStream(getContext().getContentResolver().openInputStream(imageUri));
-                        head.setImageBitmap(bitmap);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-                Glide.with(this)
-                        .load(imageUri)
-                        .circleCrop()
-                        .into(head);
-                break;
+
+                my_people.setHead(file.getPath());
+                my_people.save();
+                cursor.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            case CHOOSE_PHOTO:
-                Glide.with(this)
-                        .load(data.getData()).skipMemoryCache(true)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .circleCrop()
-                        .into(head);
-//            case 333:  Glide.with(this)
-//                    .load(data.getData()).skipMemoryCache(true)
-//                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                    .circleCrop()
-//                    .into(head);
-
-            default:
-                break;
         }
     }
 
 
 }
+

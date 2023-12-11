@@ -14,34 +14,38 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:orientation="horizontal">
+            android:layout_height="@dimen/item_layout_height"
+            android:orientation="horizontal"
+            android:background="@color/blue">
 
             <TextView
                 android:id="@+id/new_diary_text"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="新建日记"
-                android:textSize="50dp" />
+                android:text="新   建   日   记"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:textSize="25dp" />
 
             <ImageView
                 android:id="@+id/weather"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/new_diary_text"
-                android:src="@drawable/weather" />
+                android:src="@drawable/weather_home" />
             <ImageView
                 android:id="@+id/mood"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@+id/weather"
-                android:src="@drawable/mood" />
+                android:layout_alignParentRight="true"
+                android:src="@drawable/mood_home" />
 
             <ImageView
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentLeft="true"
                 android:src="@drawable/date" />
         </RelativeLayout>
         <RelativeLayout

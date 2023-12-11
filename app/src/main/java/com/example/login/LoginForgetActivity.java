@@ -6,15 +6,25 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ColorSpace;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.litepal.LitePal;
 import org.litepal.tablemanager.Connector;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +46,12 @@ public class LoginForgetActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_confirm).setOnClickListener(this);
         findViewById(R.id.return_pic).setOnClickListener(this);
         preferences=getSharedPreferences("config", Context.MODE_PRIVATE);
+    }
+
+    private byte[] img(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
     }
 
     @Override
@@ -83,6 +99,23 @@ public class LoginForgetActivity extends AppCompatActivity implements View.OnCli
            People people1=new People();
            people1.setId_name(et_id.getText().toString());
            people1.setId_password(et_password_first.getText().toString());
+           /******头像*****/
+            File imageFile = new File(this.getCacheDir(), "image.jpg");
+            FileOutputStream outputStream = null;
+            try {
+                outputStream = new FileOutputStream(imageFile);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.head);
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            people1.setHead(imageFile.getAbsolutePath());
+           /******头像*****/
            people1.save();
            Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
            /*people1.setId_password("666666");

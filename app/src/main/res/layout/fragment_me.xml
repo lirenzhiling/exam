@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".MeFragment">
 
@@ -25,8 +26,8 @@
                 <ImageView
                     android:id="@+id/head"
                     android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/head"/>
+                    android:layout_height="80dp"/>
+<!--                    android:src="@drawable/head"/>-->
 <!--                    android:background="@drawable/circle_shape"/>-->
 
                 <LinearLayout
@@ -104,5 +105,11 @@
                     android:textSize="30sp" />
             </LinearLayout>
         </LinearLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/me_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:menu="@menu/me_menu"/>
     </LinearLayout>
 </FrameLayout>

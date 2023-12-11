@@ -1,15 +1,22 @@
 package com.example.login;
 
 
+import android.media.Image;
+import android.net.Uri;
+import android.widget.ImageView;
+
 import org.litepal.crud.LitePalSupport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class People extends LitePalSupport {
     private String id_name;
     private String id_password;
+    private String head;
     private int id;
+
     private List<Diary> diaryList=new ArrayList<Diary>();
 
     public String getId_name() {
@@ -43,4 +50,13 @@ public class People extends LitePalSupport {
     public void setId(int id) {
         this.id = id;
     }
+
+    public String getHead() {
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
+    }
 }
+

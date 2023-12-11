@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -37,7 +38,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private ImageView mood;
     private TextView weather_list;
     private TextView mood_list;
-
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            // 在这里编写需要定时执行的任务
+            mounted();
+            // 重新调度下一次刷新
+            handler.postDelayed(this, 1000); // 3000 毫秒 = 3 秒
+        }
+    };
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -55,6 +65,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         view.findViewById(R.id.mood_list).setOnClickListener(this);
         weather_list.setText("全部天气");
         mood_list.setText("全部心情");
+        handler.postDelayed(runnable, 3000);
         return view;
     }
 
@@ -77,7 +88,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     }
     public void mounted() {
         if (!inited) return;
-        Log.d("调用了", "mounted: ");
         RecyclerView recyclerView;
         recyclerView = (RecyclerView) view.findViewById(R.id.recycle_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -121,20 +131,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                 int itemId = item.getItemId();
                 if (itemId == R.id.sunny) {
                     weather_list.setText("晴");
-                    mounted();
                     return true;
                 } else if (itemId == R.id.cloudy) {
                     weather_list.setText("阴");
-                    mounted();
                     return true;
                 } else if (itemId == R.id.rainy) {
                     weather_list.setText("雨");
-                    mounted();
                     return true;
                 }
                 else if (itemId==R.id.all_weather){
                     weather_list.setText("全部天气");
-                    mounted();
                     return true;
                 }
                 return false;
@@ -153,25 +159,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                 int itemId = item.getItemId();
                 if (itemId == R.id.happy) {
                     mood_list.setText("开心");
-                    mounted();
                     return true;
                 } else if (itemId == R.id.angry) {
                     mood_list.setText("生气");
-                    mounted();
                     return true;
                 } else if (itemId == R.id.sad) {
                     mood_list.setText("伤心");
-                    mounted();
                     return true;
                 }
                 else if (itemId == R.id.scary) {
                     mood_list.setText("害怕");
-                    mounted();
                     return true;
                 }
                 else if (itemId == R.id.all_mood) {
                     mood_list.setText("全部心情");
-                    mounted();
                     return true;
                 }
                 return false;
