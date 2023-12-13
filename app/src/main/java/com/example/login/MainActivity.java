@@ -60,11 +60,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+        reload();
     }
     @Override
     protected void onStart(){
         super.onStart();
-        reload();
     }
     private void reload() {
         String phone=preferences.getString("phone",null);
@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (remember) {
             String password = preferences.getString("password", null);
+            Intent intent = new Intent(this, BottomList.class);
+            intent.putExtra("id_name",et_phone.getText().toString());
+            setResult(Activity.RESULT_OK,intent);
+            register.launch(intent);
             if (password != null) {
                 et_password.setText(password);
                 ck_remember.setChecked(true);
@@ -86,9 +90,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String phone=et_phone.getText().toString();
         if(v == btn_forget){
-            /*Intent intent = new Intent(this, LoginForgetActivity.class);
+            Intent intent = new Intent(this, ForgetPasswordActivity.class);
             intent.putExtra("phone", phone);
-            register.launch(intent);*/
+            register.launch(intent);
         }
         else if(v==btn_login){
             //LitePal.getDatabase()
@@ -116,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         } else if (v == btn_zc) {
             java.util.List<People> People =LitePal.findAll(People.class);
-            Intent intent = new Intent(this, LoginForgetActivity.class);
+            Intent intent = new Intent(this, NewPeopleActivity.class);
             intent.putExtra("phone", phone);
             register.launch(intent);
         }

@@ -1,5 +1,6 @@
 package com.example.login;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
 import android.util.Log;
@@ -29,6 +31,7 @@ import java.util.List;
 public class HomeFragment extends Fragment implements View.OnClickListener{
 
     public List<Diary> diaryList=new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshLayout;
     SharedPreferences preferences;
     private String id_name="1";
     private View view;
@@ -39,15 +42,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private TextView weather_list;
     private TextView mood_list;
     private Handler handler = new Handler();
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            // 在这里编写需要定时执行的任务
-            mounted();
-            // 重新调度下一次刷新
-            handler.postDelayed(this, 1000); // 3000 毫秒 = 3 秒
-        }
-    };
+    @SuppressLint("ResourceAsColor")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,8 +60,35 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         view.findViewById(R.id.mood_list).setOnClickListener(this);
         weather_list.setText("全部天气");
         mood_list.setText("全部心情");
-        handler.postDelayed(runnable, 3000);
+        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeColors(com.google.android.material.R.color.design_default_color_primary);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
         return view;
+    }
+
+    private void refresh() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mounted();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override

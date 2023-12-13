@@ -73,7 +73,6 @@ public class EditDiary extends AppCompatActivity implements View.OnClickListener
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.return_pic); // 设置返回按钮图标
         }
-        collapsingToolbarLayout.setTitle("原神");
         findViewById(R.id.setting).setOnClickListener(this);
         findViewById(R.id.edit_diary).setOnClickListener(this);
         save_builder = new AlertDialog.Builder(EditDiary.this);
@@ -126,6 +125,7 @@ public class EditDiary extends AppCompatActivity implements View.OnClickListener
                 edit_diary.setText(diary.getContent());
             }
         }
+        collapsingToolbarLayout.setTitle(diary.getTime());
         if (diary.getImage_file()!= "1") {
             String imagePath = diary.getImage_file();
             File imageFile = new File(imagePath);

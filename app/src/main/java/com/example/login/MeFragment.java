@@ -108,7 +108,7 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
                     //Toast.makeText(v.getContext(), "你按了"+position, Toast.LENGTH_SHORT).show();
                     requireContext().startActivity(intent);
                 } else if (menuItem.getItemId() == R.id.leave) {
-                    Toast.makeText(requireContext(), "退出", Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
                 }
                 return false;
             }
