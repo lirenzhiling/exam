@@ -3,6 +3,7 @@ package com.example.login;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -106,6 +107,9 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
                     editor.putInt("id_saying", idd);
                     editor.commit();
                     //Toast.makeText(v.getContext(), "你按了"+position, Toast.LENGTH_SHORT).show();
+                    requireContext().startActivity(intent);
+                } else if (menuItem.getItemId() == R.id.bin) {
+                    Intent intent = new Intent(requireContext(), BinDiary.class);
                     requireContext().startActivity(intent);
                 } else if (menuItem.getItemId() == R.id.leave) {
                     getActivity().finish();

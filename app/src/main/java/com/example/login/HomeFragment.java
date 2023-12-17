@@ -126,7 +126,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                             weather_list.getText().toString()=="全部天气"){
                         if (diary.getMood().equals(mood_list.getText().toString())||
                                 mood_list.getText().toString()=="全部心情"){
-                            diaryList.add(diary);
+                            if (diary.getIf_delete()==0) {
+                                diaryList.add(diary);
+                            }
                         }
                     }
                 }

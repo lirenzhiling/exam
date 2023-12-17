@@ -48,9 +48,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_login.setOnClickListener(this);
         btn_zc.setOnClickListener(this);
         preferences=getSharedPreferences("config", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=preferences.edit();
-        editor.putString("id_name","123");
-        editor.commit();
+//        SharedPreferences.Editor editor=preferences.edit();
+//        editor.putString("id_name","123");
+//        editor.commit();
         register = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {

@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.List;
 
 
-public class DiaryFragment extends Fragment {
+public class BinDiaryFragment extends Fragment {
 
     static class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> {
         private List<Diary> mdiarylist;
@@ -115,16 +115,16 @@ public class DiaryFragment extends Fragment {
         private void showMoodMenu(View view) {
             PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
             MenuInflater inflater = popupMenu.getMenuInflater();
-            inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
+            inflater.inflate(R.menu.recover_menu, popupMenu.getMenu());
             popupMenu.setGravity(Gravity.END);
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     // 处理菜单项的点击事件
                     int itemId = item.getItemId();
-                    if (itemId == R.id.delete) {
+                    if (itemId == R.id.recover) {
 //                        diary1.delete();
-                        diary1.setIf_delete(1);
+                        diary1.setIf_delete(0);
                         diary1.save();
                         return true;
                     }

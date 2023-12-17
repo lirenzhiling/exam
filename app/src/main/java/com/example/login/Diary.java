@@ -9,6 +9,7 @@ public class Diary extends LitePalSupport {
     private String mood="无";
     private String people_name="无";
     private String image_file="1";
+    private int if_delete=0;
 
     /*public Diary(String time, String content) {
         this.time = time;
@@ -77,5 +78,14 @@ public class Diary extends LitePalSupport {
 
     public void setImage_file(String image_file) {
         this.image_file = image_file;
+    }
+
+
+    public int getIf_delete() {
+        return if_delete;
+    }
+
+    public void setIf_delete(int if_delete) {
+        this.if_delete = if_delete;
     }
 }
