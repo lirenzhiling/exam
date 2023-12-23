@@ -1,9 +1,11 @@
 package com.example.login;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import org.litepal.LitePal;
 import org.litepal.tablemanager.Connector;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class AddFragment extends Fragment implements View.OnClickListener{
@@ -39,6 +42,7 @@ public class AddFragment extends Fragment implements View.OnClickListener{
     private ImageView mood;
     private TextView new_weather;
     private TextView new_mood;
+    private AlertDialog.Builder save_builder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +70,37 @@ public class AddFragment extends Fragment implements View.OnClickListener{
         new_date.setText("无日期");
         new_weather.setText("无天气");
         new_mood.setText("无心情");
+        save_builder = new AlertDialog.Builder(view.getContext());
+        save_builder.setTitle("保存");  // 设置对话框标题
+        save_builder.setMessage("确定要保存该日记吗？");  // 设置对话框内容
+        save_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // 用户点击了确认按钮，执行相应的操作
+                LitePal.getDatabase();
+                Connector.getDatabase();
+                Diary diary=new Diary();
+                diary.setContent(new_diary.getText().toString());
+                diary.setPeople_name(id_name);
+                diary.setTime(new_date.getText().toString());
+                diary.setWeather(new_weather.getText().toString());
+                diary.setMood(new_mood.getText().toString());
+                diary.save();
+                new_diary.setText("");
+                Toast.makeText(view.getContext(), "已保存", Toast.LENGTH_SHORT).show();
+//            LitePal.deleteAll(Diary.class,"id<?","50");
+//            replaceFragment(new HomeFragment());
+            }
+        });
+
+        // 设置取消按钮的点击事件
+        save_builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // 用户点击了取消按钮，取消操作或执行其他操作
+                dialog.dismiss();  // 关闭对话框
+            }
+        });
         datePicker= MaterialDatePicker.Builder.datePicker().setTitleText("选择日期").build();
         return view;
     }
@@ -76,10 +111,11 @@ public class AddFragment extends Fragment implements View.OnClickListener{
             datePicker.addOnPositiveButtonClickListener(selection -> {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(selection);
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                new_date.setText(String.valueOf(year)+"年"+String.valueOf(month+1)+"月"+String.valueOf(day)+"日");
+                // 创建SimpleDateFormat实例，指定日期格式
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                // 格式化日期为字符串
+                String formattedDate = dateFormat.format(calendar.getTime());
+                new_date.setText(formattedDate);
             });
             datePicker.show(getActivity().getSupportFragmentManager(), "tag");
         } else if (v == weather) {
@@ -88,19 +124,8 @@ public class AddFragment extends Fragment implements View.OnClickListener{
         else if (v == mood) {
             showMoodMenu(v);
         }else if (v==save){
-            LitePal.getDatabase();
-            Connector.getDatabase();
-            Diary diary=new Diary();
-            diary.setContent(new_diary.getText().toString());
-            diary.setPeople_name(id_name);
-            diary.setTime(new_date.getText().toString());
-            diary.setWeather(new_weather.getText().toString());
-            diary.setMood(new_mood.getText().toString());
-            diary.save();
-            new_diary.setText("");
-            Toast.makeText(view.getContext(), "已保存", Toast.LENGTH_SHORT).show();
-//            LitePal.deleteAll(Diary.class,"id<?","50");
-//            replaceFragment(new HomeFragment());
+            AlertDialog dialog = save_builder.create();  // 创建对话框
+            dialog.show();  // 显示对话框
         }
     }
 

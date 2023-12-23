@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -32,6 +33,11 @@ public class DiaryFragment extends Fragment {
         private List<Diary> mdiarylist;
         private Diary diary1;
         SharedPreferences preferences;
+        public interface ChangeList{
+            View Change(View v,ViewGroup p);
+        }
+
+        public ChangeList changeList;
 
         class ViewHolder extends RecyclerView.ViewHolder {
             View diaryView;
@@ -55,6 +61,10 @@ public class DiaryFragment extends Fragment {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_diary, parent, false);
+            if (changeList != null) {
+                Log.v("6","6");
+                view=changeList.Change(view, parent);
+            }
             final ViewHolder holder = new ViewHolder(view);
             holder.diaryView.setOnClickListener(new View.OnClickListener() {
                 @Override

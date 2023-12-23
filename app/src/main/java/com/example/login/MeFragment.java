@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,6 +99,9 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
         view.findViewById(R.id.saying_tx).setOnClickListener(this);
         name.setText(id_name);
         NavigationView navigationView = view.findViewById(R.id.me_list);
+        CountNumber();
+
+
 //        navigationView.setCheckedItem(R.id.change);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -139,8 +144,10 @@ public class MeFragment extends Fragment implements View.OnClickListener, ModalB
         int j = 0;
         for (Diary diary : Diary) {
             if (diary.getPeople_name().equals(id_name)) {
-                i++;
-                j = j + diary.getContent().length();
+                if(diary.getIf_delete()==0) {
+                    i++;
+                    j = j + diary.getContent().length();
+                }
             }
         }
         number.setText(String.valueOf(i));

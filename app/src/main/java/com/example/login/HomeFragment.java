@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
@@ -28,7 +29,7 @@ import org.litepal.LitePal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements View.OnClickListener{
+public class HomeFragment extends Fragment implements View.OnClickListener, DiaryFragment.DiaryAdapter.ChangeList {
 
     public List<Diary> diaryList=new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -37,11 +38,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     private View view;
 
     private boolean inited = false;
+    private ImageView change;
     private ImageView weather;
     private ImageView mood;
     private TextView weather_list;
     private TextView mood_list;
     private Handler handler = new Handler();
+    private int line=1;
     @SuppressLint("ResourceAsColor")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,10 +53,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         view=inflater.inflate(R.layout.fragment_home, container, false);
         preferences=getActivity().getSharedPreferences("config", Context.MODE_PRIVATE);
         id_name=preferences.getString("id_name",null);
+        change=view.findViewById(R.id.change);
         weather=view.findViewById(R.id.weather);
         weather_list=view.findViewById(R.id.weather_list);
         mood=view.findViewById(R.id.mood);
         mood_list=view.findViewById(R.id.mood_list);
+        view.findViewById(R.id.change).setOnClickListener(this);
         view.findViewById(R.id.weather).setOnClickListener(this);
         view.findViewById(R.id.mood).setOnClickListener(this);
         view.findViewById(R.id.weather_list).setOnClickListener(this);
@@ -112,14 +117,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         if (!inited) return;
         RecyclerView recyclerView;
         recyclerView = (RecyclerView) view.findViewById(R.id.recycle_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        StaggeredGridLayoutManager layoutManager;
+        if (line==1) {
+            layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        }else {
+            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        }
         recyclerView.setLayoutManager(layoutManager);
         DiaryFragment.DiaryAdapter adapter=new DiaryFragment.DiaryAdapter(initdiary());
+        if (line==0) {
+            adapter.changeList=this;
+        }
         recyclerView.setAdapter(adapter);
     }
     private List<Diary> initdiary() {
             diaryList.removeAll(diaryList);
-            java.util.List<Diary> Diary =LitePal.findAll(Diary.class);
+            java.util.List<Diary> Diary =LitePal.order("date(time)desc").find(Diary.class);
             for (Diary diary : Diary) {
                 if (diary.getPeople_name().equals(id_name)){
                     if (diary.getWeather().equals(weather_list.getText().toString())||
@@ -135,12 +149,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
             }
         return diaryList;
     }
+
+    @Override
+    public View Change(View v,ViewGroup p) {
+        v=LayoutInflater.from(p.getContext()).inflate(R.layout.activity_diary_change, p, false);
+        return v;
+    }
     @Override
     public void onClick(View v) {
         if (v==weather){
             showWeatherMenu(v);
         } else if (v == mood) {
             showMoodMenu(v);
+        } else if (v==change) {
+            if (line==1){
+                line=0;
+            }else {
+                line=1;
+            }
+            mounted();
         }
     }
 
@@ -204,4 +231,5 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         });
         popupMenu.show();
     }
+
 }

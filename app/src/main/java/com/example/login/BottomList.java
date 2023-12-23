@@ -38,6 +38,7 @@ public class BottomList extends AppCompatActivity implements View.OnClickListene
                 return true;
             }
         });
+
     }
 
     private void selectFragment(int position) {

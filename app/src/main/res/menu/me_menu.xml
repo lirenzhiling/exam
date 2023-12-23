@@ -9,7 +9,7 @@
         <item
             android:id="@+id/bin"
             android:icon="@drawable/bin"
-            android:title="垃圾桶"/>
+            android:title="垃圾箱"/>
         <item
             android:id="@+id/leave"
             android:icon="@drawable/leave"
